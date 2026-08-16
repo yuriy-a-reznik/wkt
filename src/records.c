@@ -1,7 +1,6 @@
 /*!
  * \file records.c
- * \brief Small-record benchmark in the global (non-vanishing skew) regime: a stream of records against a fixed training
- *     set.
+ * \brief Small-record benchmark in the global (non-vanishing skew) regime: a stream of records against a fixed training set.
  *
  * Usage: wkt_records TRAINLIST TESTLIST
  *
@@ -11,23 +10,16 @@
  *
  *   xi=0        cold-start KT per record;
  *   xi=1        sample-based KT per record;
- *   offline-2s  weighted KT at the two-scale offline weight,
- *               xi* = d/(2*L*Dhat + d), Dhat the average debiased
+ *   offline-2s  weighted KT at the two-scale offline weight, xi* = d/(2*L*Dhat + d), Dhat the average debiased
  *               divergence of each training record from the rest;
- *   offline-gl  weighted KT at the global-law weight: the scalar
- *               equation of the paper's Corollary "global law" solved
- *               by bisection, with the divergence profile D(P_T||M_g)
- *               estimated by the delta-method-debiased plug-in over
+ *   offline-gl  weighted KT at the global-law weight: the scalar equation of the paper's Corollary "global law" solved
+ *               by bisection, with the divergence profile D(P_T||M_g) estimated by the delta-method-debiased plug-in over
  *               held-out training records;
- *   plugin-rec  plug-in loop restarted within each record (updates at
- *               doubling times of the record prefix);
- *   plugin-str  plug-in over the record stream: the weight for each
- *               record is set from the accumulated counts of the
+ *   plugin-rec  plug-in loop restarted within each record (updates at doubling times of the record prefix);
+ *   plugin-str  plug-in over the record stream: the weight for each record is set from the accumulated counts of the
  *               previously encoded records, constant within a record;
- *   mixture     twice-universal mixture over the weight grid, run
- *               independently per record;
- *   oracle-rec  best fixed weight per record (sweep 2^{-j/4}),
- *               summed; the mean best weight is also reported.
+ *   mixture     twice-universal mixture over the weight grid, run independently per record;
+ *   oracle-rec  best fixed weight per record (sweep 2^{-j/4}), summed; the mean best weight is also reported.
  *
  * All schemes except the oracle are sequentially decodable from the training data and the decoded stream.
  *
@@ -44,6 +36,12 @@
 #define MAX_PATH    512
 #define NSWEEP      89
 
+/*!
+ * \brief Load a file into memory.
+ * \param path  Path to the file.
+ * \param n     Output size of the file in bytes.
+ * \return      Pointer to the allocated buffer, or NULL on failure.
+ */
 static unsigned char *load_file(const char *path, unsigned long *n)
 {
     FILE *f;
@@ -78,6 +76,12 @@ static unsigned char *load_file(const char *path, unsigned long *n)
     return buf;
 }
 
+/*!
+ * \brief Load a list of file paths from a text file.
+ * \param path   Path to the list file.
+ * \param names  Output array of strings to hold the file paths.
+ * \return       Number of paths loaded, or -1 on failure.
+ */
 static int load_list(const char *path, char (*names)[MAX_PATH])
 {
     FILE *f;
@@ -107,8 +111,8 @@ static int load_list(const char *path, char (*names)[MAX_PATH])
  * raw record empirical (rc over m_len). Admissible at raw message empiricals because the mixture is bounded below by g
  * * P~.
  */
-static double profile_debiased(const unsigned long *hc, unsigned long lh, const unsigned long *rc, unsigned long m_len,
-                               double g) {
+static double profile_debiased(const unsigned long *hc, unsigned long lh, const unsigned long *rc, unsigned long m_len, double g)
+{
     double dp, bias, pt, bb, mg, vb, vp;
     int x;
     dp = 0.0;
@@ -127,6 +131,12 @@ static double profile_debiased(const unsigned long *hc, unsigned long lh, const 
     return dp > 0.0 ? dp : 0.0;
 }
 
+/*!
+ * \brief Main entry point for the small-record benchmark.
+ * \param argc  Argument count.
+ * \param argv  Argument vector: TRAINLIST TESTLIST.
+ * \return      Exit code: 0 on success, non-zero on failure.
+ */
 int main(int argc, char **argv)
 {
     static char trn_names[MAX_RECORDS][MAX_PATH];
@@ -297,6 +307,7 @@ int main(int argc, char **argv)
         free(b);
     }
 
+	/* Report the results. */
     bpc = 1.0 / (log(2.0) * (double)ntot);
     bpr = 1.0 / (log(2.0) * (double)nrec);
     printf("train records: %d, L = %lu\n", ntrn, ltrain);
@@ -318,6 +329,7 @@ int main(int argc, char **argv)
     printf("%-12s %12.4f %12.1f\n", "plugin-str", tps * bpc, tps * bpr);
     printf("%-12s %12.4f %12.1f\n", "mixture", tmx * bpc, tmx * bpr);
     printf("%-12s %12.4f %12.1f\n", "oracle-rec", tor * bpc, tor * bpr);
+
     free(trn_cnt);
     free(trn_len);
     return 0;

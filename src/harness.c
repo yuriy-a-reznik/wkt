@@ -4,16 +4,14 @@
  *
  * Usage: wkt_bench FILE1 FILE2 [FILE3 ...]
  *
- * Each file in turn is the message; the remaining files, concatenated, are the training data. Reported per file, in
- * bits per symbol:
+ * Each file in turn is the message; the remaining files, concatenated, are the training data. 
+ * Reported per file, in bits per symbol:
  *
  *   xi=0     cold-start KT (training discarded);
  *   xi=1     sample-based KT (training at full weight);
- *   xi*      weighted KT at the offline weight: xi* = d/(2*L*Dhat + d)
- *            with Dhat the average debiased pairwise divergence
+ *   xi*      weighted KT at the offline weight: xi* = d/(2*L*Dhat + d) with Dhat the average debiased pairwise divergence
  *            between the training files (the database-spread estimate);
- *   plug-in  weight re-estimated from the message prefix at doubling
- *            times;
+ *   plug-in  weight re-estimated from the message prefix at doubling times;
  *   mixture  twice-universal mixture over the weight grid.
  *
  * Also reported: the message length n, the training length L, the offline divergence estimate Dhat (nats/symbol), and
@@ -84,6 +82,7 @@ int main(int argc, char **argv)
     unsigned long ntot;
     int nf, i, j, g, npairs, x;
 
+    /* Options: --sa selects the support-adaptive estimator; --cap N truncates each message. */
     if (argc >= 2 && strcmp(argv[1], "--sa") == 0) {
         div_est = wkt_div_debiased_sa;
         argv++;
@@ -104,6 +103,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "too many files (max %d)\n", MAX_FILES);
         return 1;
     }
+    /* Load all files and precompute their symbol counts. */
     for (i = 0; i < nf; i++) {
         data[i] = load_file(argv[i + 1], &size[i]);
         if (data[i] == NULL) {
@@ -149,11 +149,13 @@ int main(int argc, char **argv)
         dhat = npairs > 0 ? dsum / (double)npairs : 0.0;
         xi3 = wkt_xi_star(ltrain, dhat);
 
+        /* Optional cap: truncate the message; the training is unchanged. */
         msg_n = size[i];
         if (msg_cap > 0 && msg_n > msg_cap) {
             msg_n = msg_cap;
         }
 
+        /* Code lengths: xi = 0, xi = 1, offline xi*, plug-in, mixture. */
         l1 = wkt_codelen(data[i], msg_n, tc, ltrain, 0.0);
         l2 = wkt_codelen(data[i], msg_n, tc, ltrain, 1.0);
         l3 = wkt_codelen(data[i], msg_n, tc, ltrain, xi3);
@@ -185,6 +187,7 @@ int main(int argc, char **argv)
         ntot += msg_n;
     }
 
+    /* Length-weighted per-symbol totals over all messages. */
     bpc = 1.0 / (log(2.0) * (double)ntot);
     printf("%-8s %8lu %9s %8s %9s %8.4f %8.4f %8.4f %8.4f %8.4f %8.4f\n",
            "total", ntot, "-", "-", "-",
