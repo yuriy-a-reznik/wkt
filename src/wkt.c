@@ -38,6 +38,7 @@
  * sequence and the already decoded message prefix.
  *
  * \copyright Copyright (c) 2026 Yuriy A. Reznik. MIT License.
+ * \date 2026-06-01
  */
 
 #include <math.h>

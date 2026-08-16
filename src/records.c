@@ -24,6 +24,7 @@
  * All schemes except the oracle are sequentially decodable from the training data and the decoded stream.
  *
  * \copyright Copyright (c) 2026 Yuriy A. Reznik. MIT License.
+ * \date 2026-06-01
  */
 
 #include <stdio.h>

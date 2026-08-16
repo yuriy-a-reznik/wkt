@@ -8,6 +8,7 @@
  * Full documentation of each function accompanies its implementation in wkt.c.
  *
  * \copyright Copyright (c) 2026 Yuriy A. Reznik. MIT License.
+ * \date 2026-06-01
  */
 
 #ifndef WKT_H

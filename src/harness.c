@@ -18,6 +18,7 @@
  * the offline effective training length xi* * L.
  *
  * \copyright Copyright (c) 2026 Yuriy A. Reznik. MIT License.
+ * \date 2026-06-01
  */
 
 #include <stdio.h>
