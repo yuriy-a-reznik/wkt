@@ -1,0 +1,9 @@
+PROJECT_NAME           = "wkt"
+PROJECT_BRIEF          = "Weighted KT coding with training data"
+OUTPUT_DIRECTORY       = doc
+INPUT                  = src README.md
+USE_MDFILE_AS_MAINPAGE = README.md
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = YES
+GENERATE_LATEX         = NO
+QUIET                  = YES
