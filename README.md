@@ -1,4 +1,4 @@
-# wkt — Weighted KT Coding with Training Data
+# wkt — Weighted KT estimator
 
 Reference implementation accompanying the paper
 
@@ -8,7 +8,7 @@ The coding distribution is a Krichevsky–Trofimov (KT) estimator over the
 byte alphabet (m = 256, d = 255) whose training counts enter once, scaled
 by a weight ξ ∈ [0, 1], and whose message counts enter at full weight:
 
-    Q(x | training, prefix) = (ξ·C[x] + k[x] + 1/2) / (ξ·L + t + m/2).
+    Q(x | training, prefix) = (ξ·C[training] + k[prefix] + 1/2) / (ξ·L + t + m/2).
 
 The paper shows that the redundancy-minimizing weight is
 ξ\* = d / (2·L·D + d), where L is the training length and D the per-symbol
